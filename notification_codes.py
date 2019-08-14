@@ -12,12 +12,55 @@ def adder_page():
     return '''
         <html>
         <body>
-            <p>Выбери подходящий файл:</p>
+        <style>
+            body {
+                background: white;
+                height: 100%;
+                background-size: cover;
+                background-repeat: no-repeat;
+                background-position: center center;
+                background-image: url("https://www.downloadwallpapers.info/dl/1920x1080//2014/08/16/445942_background-nature-pleasant-scenery_1920x1200_h.jpg") }
+            section.baka1 {
+                font-family: Arial, Geneva, Helvetica, sans-serif;
+                background: rgb(20,21,24);
+                color: white;
+                border-radius: 2em;
+                padding: 2em;
+                position: absolute;
+                top: 25%;
+                left: 50%;
+                margin-right: -50%;
+                transform: translate(-50%, -50%) }
+            section.baka2 {
+                font-family: Arial, Geneva, Helvetica, sans-serif;
+                background: rgb(20,21,24);
+                color: white;
+                border-radius: 2em;
+                padding: 2em;
+                position: absolute;
+                top: 60%;
+                left: 50%;
+                margin-right: -50%;
+                transform: translate(-50%, -50%) }
+        </style>
+        <section class="baka1">
+        <center><h4>> Сборщик нотификаций из единого реестра <</h4></center>
+        <center><h1>Выбери подходящий файл:</h1></center>
+        <br>
             <form action = "/uploader" method = "POST" 
                 enctype = "multipart/form-data">
                 <input type = "file" name = "file" />
                 <input type = "submit"/>
             </form>
+        <center><h4>Нажми "Отправить" и ожидай результат!</h4></center>
+        </section>
+
+        <section class="baka2">
+        <center><h4>> Исправлялка технической характеристики <</h4></center>
+        <center><h1>Выбери подходящий файл:</h1></center>
+        <center><i><h3>эта функция в разработке</h3></i></center>
+        <center><h4>Нажми "Отправить" и ожидай результат!</h4></center>
+        </section>
         </body>
         </html>
     '''
@@ -35,12 +78,12 @@ def upload_file():
 
         used = []
         for cat in content:
-            rawText = cat.decode("utf-8")
-            editedText = rawText.replace("\n","").replace("\r","").replace(" ","")
-            if editedText not in used:
-                if editedText != "" and editedText != " " and editedText != None:
-                    used.append(editedText)
-                    takeAnswer = final(editedText)
+            bakaCat = cat.decode("utf-8")
+            nekoCat = bakaCat.replace("\n","").replace("\r","").replace(" ","")
+            if nekoCat not in used:
+                if nekoCat != "" and nekoCat != " " and nekoCat != None:
+                    used.append(nekoCat)
+                    takeAnswer = final(nekoCat)
                     toOutput += takeAnswer
 
         return toOutput
@@ -60,7 +103,7 @@ def final(code):
         'Referer': 'https://portal.eaeunion.org/sites/odata/_layouts/15/Portal.EEC.Registry.Ui/DirectoryForm.aspx?ViewId=859ec98d-f4fe-423a-b6bc-d01b53fd4b7c&ListId=0e3ead06-5475-466a-a340-6f69c01b5687&ItemId=232',
         'X-CDAC-LOCALE': 'ru-ru',
         'X-Requested-With': 'XMLHttpRequest',
-        'Connection': 'keep-alive',
+        'Connection': 'keep-alive'
     }
     data = {
         'viewName': 'regui.SPLIST_TABLE_VIEW',
