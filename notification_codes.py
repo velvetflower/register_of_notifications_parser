@@ -1,10 +1,16 @@
-from flask import Flask, request
+from flask import Flask, request, send_file, redirect, url_for
+from werkzeug.utils import secure_filename
 import requests
 from bs4 import BeautifulSoup
+import pandas as pd
 
+filename = ""
 counter = 0
+UPLOAD_FOLDER = '/home/flask_files/'
+ALLOWED_EXTENSIONS = set(['xlsx'])
 
 app = Flask(__name__)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config["DEBUG"] = True
 
 @app.route("/", methods=["GET", "POST"])
@@ -44,9 +50,9 @@ def adder_page():
                 transform: translate(-50%, -50%) }
         </style>
         <section class="baka1">
-        <center><h4>> Сборщик нотификаций из единого реестра <</h4></center>
-        <center><h1>Выбери подходящий файл:</h1></center>
-        <br>
+            <center><h4>> Сборщик нотификаций из единого реестра <</h4></center>
+            <center><h1>Выбери подходящий файл:</h1></center>
+            <br>
             <form action = "/uploader" method = "POST" 
                 enctype = "multipart/form-data">
                 <input type = "file" name = "file" />
@@ -56,10 +62,9 @@ def adder_page():
         </section>
 
         <section class="baka2">
-        <center><h4>> Исправлялка технической характеристики <</h4></center>
-        <center><h1>Выбери подходящий файл:</h1></center>
-        <center><i><h3>эта функция в разработке</h3></i></center>
-        <center><h4>Нажми "Отправить" и ожидай результат!</h4></center>
+            <center><h4>> Исправлялка технической характеристики <</h4></center>
+            <center><a href="/upload" style="color:green;"><i><u><h3>>>> Перейти к загрузке файла <<<</h3></u></i></a></center>
+            <center><h4>Нажми "Загрузить" и действуй по инструкции!</h4></center>
         </section>
         </body>
         </html>
@@ -67,7 +72,7 @@ def adder_page():
 
 
 @app.route('/uploader', methods=['GET', 'POST'])
-def upload_file():
+def upload_fileR():
     global counter
     if request.method == 'POST':
         counter = 0
@@ -103,7 +108,7 @@ def final(code):
         'Referer': 'https://portal.eaeunion.org/sites/odata/_layouts/15/Portal.EEC.Registry.Ui/DirectoryForm.aspx?ViewId=859ec98d-f4fe-423a-b6bc-d01b53fd4b7c&ListId=0e3ead06-5475-466a-a340-6f69c01b5687&ItemId=232',
         'X-CDAC-LOCALE': 'ru-ru',
         'X-Requested-With': 'XMLHttpRequest',
-        'Connection': 'keep-alive'
+        'Connection': 'keep-alive',
     }
     data = {
         'viewName': 'regui.SPLIST_TABLE_VIEW',
@@ -147,19 +152,116 @@ def final(code):
     statu = listos[8].replace(" ", "")
     regst = listos[9].replace(" ", "")
     return f"""
-<html>
-    <body>
-        <p>№ {counter} |=====================================><a href="/"> На главную страницу <<<</a></p>
-        <p>1. Номер нотификации: {nomer}</p>
-        <p>2. Идентификатор: {ident}</p>
-        <p>3. Наименование товара: {naime}</p>
-        <p>4. Изготовитель товара: {izgot}</p>
-        <p>5. Срок действия: {srokd}</p>
-        <p>6. Статус: {statu}</p>
-        <p>8. Дата регистрации нотификации: {regst}</p>
-    </body>
-</html>"""
+    <html>
+        <body>
+            <p>№ {counter} |=====================================><a href="/"> На главную страницу <<<</a></p>
+            <p>1. Номер нотификации: {nomer}</p>
+            <p>2. Идентификатор: {ident}</p>
+            <p>3. Наименование товара: {naime}</p>
+            <p>4. Изготовитель товара: {izgot}</p>
+            <p>5. Срок действия: {srokd}</p>
+            <p>6. Статус: {statu}</p>
+            <p>8. Дата регистрации нотификации: {regst}</p>
+        </body>
+    </html>"""
 
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
+
+@app.route('/upload', methods=['GET', 'POST'])
+def upload_file():
+    global filename
+    if request.method == 'POST':
+        file = request.files['file']
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            return '''
+        <html>
+        <body>
+        <style>
+            body {
+                background: white;
+                height: 100%;
+                background-size: cover;
+                background-repeat: no-repeat;
+                background-position: center center;
+                background-image: url("https://www.downloadwallpapers.info/dl/1920x1080//2014/08/16/445942_background-nature-pleasant-scenery_1920x1200_h.jpg") }
+            section.uploadBaka {
+                font-family: Arial, Geneva, Helvetica, sans-serif;
+                background: rgb(20,21,24);
+                color: white;
+                border-radius: 4em;
+                padding: 3em;
+                position: absolute;
+                top: 30%;
+                left: 50%;
+                margin-right: -50%;
+                transform: translate(-50%, -50%) }
+        </style>
+        <section class="uploadBaka">
+            <center><h1>2. Файл готов! Скачать?</h1></center>
+            <center>
+            <form action="/download">
+                <input type="submit" value="Скачать!" />
+            </form>
+            </center>
+            <a href="/" style="color:yellow;"><h3>Нажми сюда что бы вернуться на главную</h3></a>
+        </section>
+        </body>
+        </html>
+    '''
+
+    return '''
+        <html>
+        <body>
+        <style>
+            body {
+                background: white;
+                height: 100%;
+                background-size: cover;
+                background-repeat: no-repeat;
+                background-position: center center;
+                background-image: url("https://www.downloadwallpapers.info/dl/1920x1080//2014/08/16/445942_background-nature-pleasant-scenery_1920x1200_h.jpg") }
+            section.uploadBaka {
+                font-family: Arial, Geneva, Helvetica, sans-serif;
+                background: rgb(20,21,24);
+                color: white;
+                border-radius: 4em;
+                padding: 3em;
+                position: absolute;
+                top: 30%;
+                left: 50%;
+                margin-right: -50%;
+                transform: translate(-50%, -50%) }
+        </style>
+        <section class="uploadBaka">
+            <h1>1. Выбери загружаемый файл:</h1>
+            <form action="" method=post enctype=multipart/form-data>
+            <p><input type=file name=file>
+                <input type=submit value=Загрузить>
+            </form>
+        </section>
+        </body>
+        </html>
+    '''
+
+@app.route('/download')
+def downloadFile ():
+    global filename
+    df = pd.read_excel(UPLOAD_FOLDER + filename).sort_values('Страна происхождения')
+    empty_row = pd.DataFrame({'a':['']})
+    out = UPLOAD_FOLDER + r'result.xlsx'
+    writer = pd.ExcelWriter(out)
+    count = 0
+    for k,g in df.groupby(df['Техническая характеристика'].str.extract(r'(\w+)\s+', expand=False)):
+        g.to_excel(writer, index=False, header=(count==0), startrow=count+(count!=0))
+        count += len(g)
+        empty_row.to_excel(writer, header=None, index=False, startrow=count+1)
+        count +=1
+    writer.save()
+    return send_file(out, as_attachment=True)
 
 if (__name__ == "__main__"):
     app.run(host='127.0.0.1', port=5000)
