@@ -3,6 +3,7 @@ from werkzeug.utils import secure_filename
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
+import os
 
 filename = ""
 counter = 0
@@ -15,17 +16,136 @@ app.config["DEBUG"] = True
 
 @app.route("/", methods=["GET", "POST"])
 def adder_page():
-    return '''
-        <html>
+    return """
+    <!DOCTYPE html>
+    <html lang="ru" >
+    <head>
+
+        <meta charset="UTF-8">
+        <title>Таможенный помощник v0.1</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1"><link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Open+Sans:400,800|Poppins'>
+        <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/weather-icons/2.0.9/css/weather-icons.min.css'>
+        <link rel="stylesheet" href="C:/Users/code971/Desktop/TEST/style.css">
+        </head>
         <body>
         <style>
-            body {
-                background: white;
-                height: 100%;
-                background-size: cover;
-                background-repeat: no-repeat;
-                background-position: center center;
-                background-image: url("https://www.downloadwallpapers.info/dl/1920x1080//2014/08/16/445942_background-nature-pleasant-scenery_1920x1200_h.jpg") }
+        body {
+            font-family: "Poppins", "Open Sans", Arial, sans-serif;
+            font-size: 18px;
+            }
+
+            * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            }
+
+            .container {
+            background-color: #000;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            justify-content: center;
+            flex-direction: column;
+            height: 100vh;
+            align-items: center;
+            line-height: 1;
+            color: #fff;
+            position: relative;
+            z-index: -2;
+            }
+            .container:after {
+            content: "";
+            background: rgba(100, 100, 100, 0.4);
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            z-index: -1;
+            }
+            .container #images {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: -1;
+            overflow: hidden;
+            }
+            .container #images .image {
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            right: 0;
+            left: 0;
+            opacity: 0;
+            transition: opacity 1s ease;
+            }
+            .container #images .image.active {
+            opacity: 1;
+            }
+            .container #weather {
+            text-transform: capitalize;
+            font-family: "Open Sans", Arial, sans-serif;
+            letter-spacing: 2px;
+            }
+            .container #bgProgress {
+            height: 5px;
+            width: 0;
+            background: rgba(0, 0, 0, 0.4);
+            position: absolute;
+            top: 0;
+            left: 0;
+            transition: width .13s linear;
+            }
+            .container #clock {
+            font-size: 80px;
+            }
+            @media screen and (max-height: 360px) {
+            .container #clock {
+                font-size: 64px;
+            }
+            }
+            @media screen and (max-width: 580px) {
+            .container #clock {
+                font-size: 85px;
+            }
+            }
+            @media screen and (max-width: 360px) {
+            .container #clock {
+                font-size: 64px;
+                letter-spacing: -4px;
+            }
+            }
+            .container #clock span {
+            display: inline-block;
+            font-family: "Open Sans", Arial, sans-serif;
+            position: relative;
+            top: -.5rem;
+            line-height: .5em;
+            }
+            .container #date {
+            padding: 0 10px;
+            text-align: center;
+            position: absolute;
+            top: 20px;
+            width: 100%;
+            }
+            @media screen and (max-height: 320px) {
+            .container #date {
+                position: static;
+            }
+            }
+            @media screen and (max-width: 370px) {
+            .container #date {
+                font-size: 16px;
+            }
+            }
+
             section.baka1 {
                 font-family: Arial, Geneva, Helvetica, sans-serif;
                 background: rgb(20,21,24);
@@ -44,32 +164,443 @@ def adder_page():
                 border-radius: 2em;
                 padding: 2em;
                 position: absolute;
-                top: 60%;
+                top: 72%;
                 left: 50%;
                 margin-right: -50%;
                 transform: translate(-50%, -50%) }
+
+                            tml, body, div, span, applet, object, iframe,
+                h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+                a, abbr, acronym, address, big, cite, code,
+                del, dfn, em, img, ins, kbd, q, s, samp,
+                small, strike, strong, sub, sup, tt, var,
+                b, u, i, center,
+                dl, dt, dd, ol, ul, li,
+                fieldset, form, label, legend,
+                table, caption, tbody, tfoot, thead, tr, th, td,
+                article, aside, canvas, details, embed,
+                figure, figcaption, footer, header, hgroup,
+                menu, nav, output, ruby, section, summary,
+                time, mark, audio, video {
+                margin: 0;
+                padding: 0;
+                border: 0;
+                font-size: 100%;
+                font: inherit;
+                vertical-align: baseline;
+                }
+
+                article, aside, details, figcaption, figure,
+                footer, header, hgroup, menu, nav, section {
+                display: block;
+                }
+
+                body {
+                line-height: 1;
+                }
+
+                ol, ul {
+                list-style: none;
+                }
+
+                blockquote, q {
+                quotes: none;
+                }
+
+                blockquote:before, blockquote:after,
+                q:before, q:after {
+                content: '';
+                content: none;
+                }
+
+                table {
+                border-collapse: collapse;
+                border-spacing: 0;
+                }
+
+                .about {
+                margin: 70px auto 40px;
+                padding: 8px;
+                width: 260px;
+                font: 10px/18px 'Lucida Grande', Arial, sans-serif;
+                color: #666;
+                text-align: center;
+                text-shadow: 0 1px rgba(255, 255, 255, 0.25);
+                background: #eee;
+                background: rgba(250, 250, 250, 0.8);
+                border-radius: 4px;
+                background-image: -webkit-linear-gradient(top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.1));
+                background-image: -moz-linear-gradient(top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.1));
+                background-image: -o-linear-gradient(top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.1));
+                background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.1));
+                -webkit-box-shadow: inset 0 1px rgba(255, 255, 255, 0.3), inset 0 0 0 1px rgba(255, 255, 255, 0.1), 0 0 6px rgba(0, 0, 0, 0.2);
+                box-shadow: inset 0 1px rgba(255, 255, 255, 0.3), inset 0 0 0 1px rgba(255, 255, 255, 0.1), 0 0 6px rgba(0, 0, 0, 0.2);
+                }
+                .about a {
+                color: #333;
+                text-decoration: none;
+                border-radius: 2px;
+                -webkit-transition: background 0.1s;
+                -moz-transition: background 0.1s;
+                -o-transition: background 0.1s;
+                transition: background 0.1s;
+                }
+                .about a:hover {
+                text-decoration: none;
+                background: #fafafa;
+                background: rgba(255, 255, 255, 0.7);
+                }
+
+                .about-links {
+                height: 30px;
+                }
+                .about-links > a {
+                float: left;
+                width: 50%;
+                line-height: 30px;
+                font-size: 12px;
+                }
+
+                .about-author {
+                margin-top: 5px;
+                }
+                .about-author > a {
+                padding: 1px 3px;
+                margin: 0 -1px;
+                }
+
+                .sign-up {
+                position: relative;
+                margin: 50px auto;
+                width: 580px;
+                padding: 33px 25px 29px;
+                background: white;
+                border-bottom: 1px solid #c4c4c4;
+                border-radius: 5px;
+                -webkit-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
+                box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
+                }
+                .sign-up:before, .sign-up:after {
+                content: '';
+                position: absolute;
+                bottom: 1px;
+                left: 0;
+                right: 0;
+                height: 10px;
+                background: inherit;
+                border-bottom: 1px solid #d2d2d2;
+                border-radius: 4px;
+                }
+                .sign-up:after {
+                bottom: 3px;
+                border-color: #dcdcdc;
+                }
+
+                .sign-up-title {
+                margin: -25px -25px 25px;
+                padding: 15px 25px;
+                line-height: 35px;
+                font-size: 26px;
+                font-weight: 300;
+                color: #aaa;
+                text-align: center;
+                text-shadow: 0 1px rgba(255, 255, 255, 0.75);
+                background: #f7f7f7;
+                }
+                .sign-up-title:before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 8px;
+                background: #c4e17f;
+                border-radius: 5px 5px 0 0;
+                background-image: -webkit-linear-gradient(left, #c4e17f, #c4e17f 12.5%, #f7fdca 12.5%, #f7fdca 25%, #fecf71 25%, #fecf71 37.5%, #f0776c 37.5%, #f0776c 50%, #db9dbe 50%, #db9dbe 62.5%, #c49cde 62.5%, #c49cde 75%, #669ae1 75%, #669ae1 87.5%, #62c2e4 87.5%, #62c2e4);
+                background-image: -moz-linear-gradient(left, #c4e17f, #c4e17f 12.5%, #f7fdca 12.5%, #f7fdca 25%, #fecf71 25%, #fecf71 37.5%, #f0776c 37.5%, #f0776c 50%, #db9dbe 50%, #db9dbe 62.5%, #c49cde 62.5%, #c49cde 75%, #669ae1 75%, #669ae1 87.5%, #62c2e4 87.5%, #62c2e4);
+                background-image: -o-linear-gradient(left, #c4e17f, #c4e17f 12.5%, #f7fdca 12.5%, #f7fdca 25%, #fecf71 25%, #fecf71 37.5%, #f0776c 37.5%, #f0776c 50%, #db9dbe 50%, #db9dbe 62.5%, #c49cde 62.5%, #c49cde 75%, #669ae1 75%, #669ae1 87.5%, #62c2e4 87.5%, #62c2e4);
+                background-image: linear-gradient(to right, #c4e17f, #c4e17f 12.5%, #f7fdca 12.5%, #f7fdca 25%, #fecf71 25%, #fecf71 37.5%, #f0776c 37.5%, #f0776c 50%, #db9dbe 50%, #db9dbe 62.5%, #c49cde 62.5%, #c49cde 75%, #669ae1 75%, #669ae1 87.5%, #62c2e4 87.5%, #62c2e4);
+                }
+
+                input {
+                font-family: inherit;
+                color: inherit;
+                -webkit-box-sizing: border-box;
+                -moz-box-sizing: border-box;
+                box-sizing: border-box;
+                }
+
+                .sign-up-input {
+                width: 100%;
+                height: 50px;
+                margin-bottom: 25px;
+                padding: 0 15px 2px;
+                font-size: 17px;
+                background: white;
+                border: 2px solid #ebebeb;
+                border-radius: 4px;
+                -webkit-box-shadow: inset 0 -2px #ebebeb;
+                box-shadow: inset 0 -2px #ebebeb;
+                }
+                .sign-up-input:focus {
+                border-color: #62c2e4;
+                outline: none;
+                -webkit-box-shadow: inset 0 -2px #62c2e4;
+                box-shadow: inset 0 -2px #62c2e4;
+                }
+                .lt-ie9 .sign-up-input {
+                line-height: 48px;
+                }
+
+                .sign-up-button {
+                position: relative;
+                vertical-align: top;
+                width: 100%;
+                height: 54px;
+                padding: 0;
+                font-size: 22px;
+                color: white;
+                text-align: center;
+                text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+                background: #f0776c;
+                border: 0;
+                border-bottom: 2px solid #d76b60;
+                border-radius: 5px;
+                cursor: pointer;
+                -webkit-box-shadow: inset 0 -2px #d76b60;
+                box-shadow: inset 0 -2px #d76b60;
+                }
+                .sign-up-button:active {
+                top: 1px;
+                outline: none;
+                -webkit-box-shadow: none;
+                box-shadow: none;
+                }
+
+                :-moz-placeholder {
+                color: #ccc;
+                font-weight: 300;
+                }
+
+                ::-moz-placeholder {
+                color: #ccc;
+                opacity: 1;
+                font-weight: 300;
+                }
+
+                ::-webkit-input-placeholder {
+                color: #ccc;
+                font-weight: 300;
+                }
+
+                :-ms-input-placeholder {
+                color: #ccc;
+                font-weight: 300;
+                }
+
+                ::-moz-focus-inner {
+                border: 0;
+                padding: 0;
+                }
+
         </style>
-        <section class="baka1">
-            <center><h4>> Сборщик нотификаций из единого реестра <</h4></center>
-            <center><h1>Выбери подходящий файл:</h1></center>
-            <br>
+
+        <div class="container">
+        <div id="bgProgress"></div>
+        <form class="sign-up">
+            <h1 class="sign-up-title">Сборщик нотификаций из реестра</h1>
+            <center>
             <form action = "/uploader" method = "POST" 
                 enctype = "multipart/form-data">
-                <input type = "file" name = "file" />
-                <input type = "submit"/>
+                <input type = "file" name = "file" class="sign-up-button" />
+                <input type = "submit" class="sign-up-button" />
             </form>
-        <center><h4>Нажми "Отправить" и ожидай результат!</h4></center>
-        </section>
+            </center>
+        </form>
+        <div id="images">
+            <div class="image active" style="background-image: url('https://storage.googleapis.com/chydlx/codepen/minimalist-widget-page/dan-rogers-1156523.jpg');"></div>
+            <div class="image" style="background-image: url('https://storage.googleapis.com/chydlx/codepen/minimalist-widget-page/jaanus-jagomagi-1245736.jpg');"></div>
+            <div class="image" style="background-image: url('https://storage.googleapis.com/chydlx/codepen/minimalist-widget-page/patrick-tomasso-1272187.jpg');"></div>
+            <div class="image" style="background-image: url('https://storage.googleapis.com/chydlx/codepen/minimalist-widget-page/sven-scheuermeier-37377.jpg');"></div>
+            <div class="image" style="background-image: url('https://storage.googleapis.com/chydlx/codepen/minimalist-widget-page/tim-easley-1131834.jpg');"></div>
+            <div class="image" style="background-image: url('https://storage.googleapis.com/chydlx/codepen/minimalist-widget-page/weroad-1102821.jpg');"></div>
+        </div>
+        <div id="date">
+            <p>Monday, July 17, 2016</p>
+        </div>
+        <div id="clock">
+            <p>
+            3<span>:</span>00PM</p>
+        </div>
+        <div id="weather">
+            <p>
+            72&#8457; <i class="wi wi-day-sunny"> </i> Sunny</p>
+        </div>
+        <form class="sign-up">
+            <h1 class="sign-up-title">Исправлялка спецификации</h1>
+            <center><h1 class="sign-up-button"> <a href="/upload"> >>> Перейти к загрузке файла <<< </a> </h1></center>
+        </form>
+        </div>
+        <!-- partial -->
+        <script type="text/javascript">
+            var dateObj = (function() {
 
-        <section class="baka2">
-            <center><h4>> Исправлялка технической характеристики <</h4></center>
-            <center><a href="/upload" style="color:green;"><i><u><h3>>>> Перейти к загрузке файла <<<</h3></u></i></a></center>
-            <center><h4>Нажми "Загрузить" и действуй по инструкции!</h4></center>
-        </section>
-        </body>
-        </html>
-    '''
+            function month(num) {
+                var months = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
+                return months[num];
+            }
 
+            function day(num) {
+                var days = ["Воскресенье", "Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"];
+                return days[num];
+            }
+
+            function _getDate() {
+                var today = new Date(),
+                date = {};
+
+                date = {
+                date: today.getDate(),
+                day: day(today.getDay()), 
+                month: month(today.getMonth()),
+                year: today.getFullYear()
+                };
+
+                return date;
+            }
+
+            return _getDate;
+
+            }());
+
+            var timeObj = (function() {
+            var time = {};
+
+            function _getTime() {
+                var _time = new Date(),
+                hours = _time.getHours(),
+                minutes = _time.getMinutes(),
+                seconds = _time.getSeconds();
+
+                time = {
+                hour: hours === 0 ? hours = 12 : (hours > 12 ? hours - 12 : hours),
+                mins: minutes < 10 ? "0" + minutes : minutes,
+                period: hours >= 12 ? "PM" : "AM",
+                secs: seconds < 10 ? "0" + seconds : seconds
+                };
+                
+                return time;
+            }
+
+            return _getTime;
+            }());
+
+            var setDateTime = (function() {
+            var elm_clock = document.querySelector('#clock p'),
+                elm_date = document.querySelector('#date p');
+
+            var defaults = {
+                dateMsg: "%dateDay, %dateMonth %dateDate, %dateYear",
+                timeMsg: "%timeHour<span>:</span>%timeMinutes %timePeriod"
+            };
+
+            function _setTime() {
+                var msg = defaults.timeMsg
+                .replace('%timeHour', timeObj().hour)
+                .replace('%timeMinutes', timeObj().mins)
+                .replace('%timePeriod', timeObj().period);
+                elm_clock.innerHTML = msg;
+            }
+
+            function _setDate() {
+                var msg = defaults.dateMsg
+                .replace('%dateDay', dateObj().day)
+                .replace('%dateMonth', dateObj().month)
+                .replace('%dateDate', dateObj().date)
+                .replace('%dateYear', dateObj().year);
+
+                elm_date.innerHTML = msg;
+            }
+
+            _setTime();
+            _setDate();
+
+            setInterval(function() {
+                _setDate();
+                _setTime();
+            }, 1000);
+            }());
+
+            var cycleBG = (function() {
+            var progressBar = document.querySelector('#bgProgress'),
+                duration = 15000,
+                bgImages = document.querySelectorAll('#images .image'),
+                i = 0,
+                x = 0;
+            
+            console.log(bgImages);
+
+            function changeBg() {
+                // if i >= bgImages.length -1
+                (i >= bgImages.length - 1) ? i = 0: i++;
+                //change bg image
+                bgImages.forEach(function(img, index){
+                img.classList.remove('active');
+                if(index === i) { img.classList.add('active') }
+                })
+            }
+
+            changeBg();
+
+            setInterval(function() {
+                // if x === 100
+                x === 100 ? (x = 0, changeBg() ) : x++;
+                //progressBar width = x
+                progressBar.style.width = x + '%';
+            }, (duration / 100));
+            }());
+
+            var weatherWidget = (function() {
+            var cont = document.querySelector('#weather');
+            var apiCall = {
+                id: "d65a9694ae6425d1e080326aab19db69",
+                unit: "metric",
+                coor: {
+                lat: 45.0519047,
+                lon: 38.9904714
+                }
+            };
+
+            function renderWeather(data) {
+                var html = "<p>";
+                html += Math.floor(data.main.temp);
+                html += apiCall.unit === "imperial" ? "&#8457;" : "&#8451;";
+                html += " <i class='wi wi-fw wi-owm-";
+                html += timeObj().period === "PM" ? "night-" : "day-";
+                html += data.weather[0].id + "'></i> ";
+                html += data.weather[0].description;
+                html += "</p>";
+
+                cont.innerHTML = html;
+            }
+
+            var apiURL = "https://api.openweathermap.org/data/2.5/weather?APPID=" + apiCall.id + "&units=" + apiCall.unit + "&lat=" + apiCall.coor.lat + "&lon=" + apiCall.coor.lon;
+
+            var http = new XMLHttpRequest();
+
+            http.onreadystatechange = function() {
+                if (http.readyState == 4 && http.status == 200) {
+                var data = JSON.parse(http.responseText);
+                renderWeather(data);
+                }
+            };
+            http.open("GET", apiURL, true);
+            http.send();
+
+            }());
+        </script>
+    </body>
+</html> """
 
 @app.route('/uploader', methods=['GET', 'POST'])
 def upload_fileR():
