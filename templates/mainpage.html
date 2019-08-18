@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+    <html lang="ru" >
+    <head>
+
+        <meta charset="UTF-8">
+        <title>Таможенный помощник v0.1</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1"><link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Open+Sans:400,800|Poppins'>
+        <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/weather-icons/2.0.9/css/weather-icons.min.css'>
+        <link href="{{ url_for('static', filename='styles/style.css') }}" rel="stylesheet" type="text/css" >
+        </head>
+        <body>
+
+        <!-- partial:index.partial.html -->
+
+        <section class="baka1">
+            <center><h4>> Сборщик нотификаций из единого реестра <</h4>
+            <br>
+            <h1>Выбери подходящий файл:</h1>
+            <br>
+            <form action = "/uploader" method = "POST" 
+                enctype = "multipart/form-data">
+                <input type = "file" name = "file" />
+                <input type = "submit"/>
+            </form>
+            <br>
+        <h4>Нажми "Отправить" и ожидай результат!</h4></center>
+        </section>
+
+        <section class="baka2">
+            <center><h4>> Исправлялка технической характеристики <</h4>
+            <br>
+            <a href="/upload" style="color:green;"><i><u><h3>>>> Перейти к загрузке файла <<<</h3></u></i></a>
+            <br>
+            <h4>Нажми "Загрузить" и действуй по инструкции!</h4></center>
+        </section>
+
+        <div class="container">
+        <div id="bgProgress"></div>
+        <div id="images">
+            <div class="image active" style="background-image: url('https://storage.googleapis.com/chydlx/codepen/minimalist-widget-page/dan-rogers-1156523.jpg');"></div>
+            <div class="image" style="background-image: url('https://storage.googleapis.com/chydlx/codepen/minimalist-widget-page/jaanus-jagomagi-1245736.jpg');"></div>
+            <div class="image" style="background-image: url('https://storage.googleapis.com/chydlx/codepen/minimalist-widget-page/patrick-tomasso-1272187.jpg');"></div>
+            <div class="image" style="background-image: url('https://storage.googleapis.com/chydlx/codepen/minimalist-widget-page/sven-scheuermeier-37377.jpg');"></div>
+            <div class="image" style="background-image: url('https://storage.googleapis.com/chydlx/codepen/minimalist-widget-page/tim-easley-1131834.jpg');"></div>
+            <div class="image" style="background-image: url('https://storage.googleapis.com/chydlx/codepen/minimalist-widget-page/weroad-1102821.jpg');"></div>
+        </div>
+        <div id="date">
+            <p>Monday, July 17, 2016</p>
+        </div>
+        <div id="clock">
+            <p>
+            3<span>:</span>00PM</p>
+        </div>
+        <div id="weather">
+            <p>
+            72&#8457; <i class="wi wi-day-sunny"> </i> Sunny</p>
+        </div>
+        </div>
+        <script src="{{ url_for('static', filename='scripts/clocks.js') }}"></script>
+    </body>
+</html>
